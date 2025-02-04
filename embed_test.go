@@ -30,11 +30,10 @@ func TestByteArray(t *testing.T) {
 	}
 }
 
-//go:embed files/*
+//go:embed files/a.txt
+//go:embed files/b.txt
+//go:embed files/c.txt
 var files embed.FS
-
-// or you can specify a specific file to embed
-// //go:embed files/a.txt
 
 func TestEmbedMultipleFiles(t *testing.T) {
 	a, _ := files.ReadFile("files/a.txt")
@@ -45,4 +44,18 @@ func TestEmbedMultipleFiles(t *testing.T) {
 
 	c, _ := files.ReadFile("files/c.txt")
 	fmt.Println(string(c))
+}
+
+//go:embed files/*.txt
+var path embed.FS // path matcher reference https://pkg.go.dev/path#Match
+
+func TestPathMatcher(t *testing.T) {
+	dir, _ := path.ReadDir("files")
+	for _, entry := range dir {
+		if !entry.IsDir() {
+			fmt.Println(entry.Name())
+			file, _ := path.ReadFile("files/" + entry.Name())
+			fmt.Println(string(file))
+		}
+	}
 }
